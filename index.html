@@ -1,0 +1,107 @@
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Instagram Downloader | Webdevtrick.com</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <!-- <link rel="stylesheet" href="style.css"> -->
+  <style>*{box-sizing:border-box;margin:0;padding:0;font-family:Roboto,sans-serif;color:#fff;outline:0!important}body{display:flex;background-color:#2ecc71;padding-top:100px;padding-bottom:100px}main{margin:auto;width:450px;max-width:100%;text-align:center}.qrImage{background-color:#fff;padding:15px;border-radius:4px;width:285px;max-width:100%;margin:auto;margin-top:30px}.qrImage img{width:100%}input{background-color:rgba(0,0,0,.2);border:0;height:45px;color:#fff;width:100%;font-weight:500;text-align:center;border-radius:3px;text-align:left;padding-left:60px;padding-right:15px}.inputGroup{display:flex;width:285px;max-width:100%;margin:auto}.inputGroup i{width:45px;min-width:45px;position:relative;margin-right:-45px;height:25px;line-height:25px;color:#fff;font-size:12px;top:10px;background-color:transparent;border-right:1px solid rgba(255,255,255,.2);opacity:.8}.titleQr{margin-bottom:40px;color:#fff;font-weight:400;font-size:34px;text-transform:uppercase;text-shadow:2px 2px 0 rgba(0,0,0,.1)}strong{font-weight:600}.downloadQr a{display:none}.downloadBtn{margin-top:20px;height:45px;border:0;color:#2ecc71;background-color:#fff;text-transform:uppercase;font-family:Roboto,sans-serif;font-weight:500;padding-left:20px;padding-right:20px;line-height:45px;border-radius:3px;cursor:pointer;opacity:.8;transition:opacity .4s,box-shadow .4s}.downloadBtn:hover{opacity:1;box-shadow:2px 2px 0 0 rgba(0,0,0,.2)}.inputTitle{color:#fff;font-size:14px;margin-bottom:3px;opacity:.9}section.result img,section.result video{width:100%;border-radius:6px}section.result{display:none;margin-top:30px;background-color:#fff;padding:14px;border-radius:7px}section.result *{color:#777;text-align:center}section.result p{margin-top:13px}section.result a{display:block;margin:auto;width:min-content;padding:10px;background-color:#2ecc71;margin-top:10px;color:#fff;text-decoration:none;text-transform:uppercase;font-weight:600;letter-spacing:.5px;font-size:14px;padding-left:19px;padding-right:19px;border-radius:3px;box-shadow:1px 1px 4px 0 rgb(0 0 0 / 18%)}</style>
+</head>
+<body>
+  <main>
+    <header class="navbar">
+	    <h1 class="titleQr">INSTAGRAM <strong>DOWNLOADER</strong></h1>
+		<p class="inputTitle">Cole o link da publicação abaixo</p>
+      	<div class="inputGroup">
+			<i class="fa fa-link"></i>
+			<input id="text" type="text">
+		</div>
+    </header>
+    <section class="result">
+      	<div class="image-placeholder"></div>
+    </section>
+  </main>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script type="text/javascript">  	
+    $('input').on('change', function() {
+      	getMedia();
+      	$('section.result').fadeIn('');
+    });
+
+    const _ = e => document.querySelector(e);
+    const render = _('.result');
+
+
+    // create video
+    const createVideo = data => {
+		let v = document.createElement('video');
+		v.id = "instavideo";
+		v.src = data.content; 
+		v.controls = true;
+		v.autoplay = true;
+
+		// create info
+		let info = document.createElement('p');
+		info.textContent = "Click the right button on video and select save as.";
+
+		render.innerHTML = ""; 
+		render.appendChild(v);
+		render.appendChild(info);
+    };
+    // create image
+    const createImg = data => {
+		// create image
+		let i = document.createElement('img');
+		i.id = "instaImg";
+		i.src = data.content;
+
+		// create info
+		let info = document.createElement('p');
+		info.textContent = "Click the right button on the image and select save image..";
+
+		render.innerHTML = ""; 
+		render.appendChild(i);     
+		render.appendChild(info);
+    };
+
+    // extract html
+    const getMedia = () => {
+		render.innerHTML = "<div class='image-placeholder'></div>";
+		// get input value
+		let url = _('input').value;
+		if (url) {
+		fetch(url).
+		then(r => r.text()).
+		then(r => {
+			// render html
+			render.innerHTML = r;
+			// wait, find meta and create video or image
+			let w = setTimeout(() => {
+			let v = _('meta[property="og:video"]');
+			if (v) {
+			  createVideo(v);
+			  $('.result').append('<a href="'+$('video').attr('src')+'" download>Download</a>');
+			} else {
+			  let img = _('meta[property="og:image"]');
+			  if (img) {
+			    createImg(img);
+			    $('.result').append('<a href="'+$('img').attr('src')+'" download>Download</a>');
+			  } else {
+			    document.body.innerHTML = body;
+			    alert('Error extracting Instagram image / video.');
+			  };
+			}
+			clearTimeout(w);
+		  	}, 200);
+		});
+		} else {
+		_('input').setAttribute('placeholder', 'Invalid address, use a proper Insagram link');
+
+		}
+    };
+  </script>
+
+</body>
+</html>
